@@ -24,18 +24,20 @@ class LoginViewModel @Inject constructor(
                 payload = LoginRequest(identifier, password),
                 onSuccess = { response ->
                     _state.value = state.value.copy(
-                        response = "Login success"
+                        user = response
                     )
                 },
                 onFailure = { response ->
                     _state.value = state.value.copy(
-                        response = response.message
+                        response = response.message,
+                        user = null
                     )
                 },
                 onStart = {
                     _state.value = state.value.copy(
                         loading = true,
-                        response = ""
+                        response = "",
+                        user = null
                     )
                 },
                 onFinish = {

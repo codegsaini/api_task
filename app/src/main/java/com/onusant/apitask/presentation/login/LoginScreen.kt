@@ -44,6 +44,7 @@ fun LoginScreen(
 
     val loading = viewModel.state.value.loading
     val response = viewModel.state.value.response
+    val user = viewModel.state.value.user
 
     val identifier = remember { mutableStateOf(TextFieldValue("")) }
     val password = remember { mutableStateOf(TextFieldValue("")) }
@@ -123,6 +124,16 @@ fun LoginScreen(
                     .padding(20.dp),
                 textAlign = TextAlign.Center,
                 color = Color(0xFFFA3C3C)
+            )
+        }
+        user?.let{
+            Text(
+                text = "${it.username} logged in successfully\nToken: ${it.access_token}",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(20.dp),
+                textAlign = TextAlign.Center,
+                color = Color(0xFF4C8B2D)
             )
         }
     }

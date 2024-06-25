@@ -1,5 +1,6 @@
 package com.onusant.apitask.data.repository
 
+import android.util.Log
 import com.onusant.apitask.data.service.LoginRequest
 import com.onusant.apitask.data.service.LoginService
 import com.onusant.apitask.model.Property
@@ -12,7 +13,7 @@ class LoginRepository(private val loginService: LoginService) {
 
     suspend fun login(
         payload: LoginRequest,
-        onSuccess: (Response<User>) -> Unit,
+        onSuccess: (User) -> Unit,
         onFailure: (Error) -> Unit,
         onStart: () -> Unit,
         onFinish: () -> Unit
@@ -21,7 +22,7 @@ class LoginRepository(private val loginService: LoginService) {
         val response = handleAPIResponse<User> { loginService.login(payload) }
         when (response) {
             is Response.Success -> {
-                onSuccess(response)
+                onSuccess(response.data)
             }
             is Response.Failure -> {
                 onFailure(response.error)
