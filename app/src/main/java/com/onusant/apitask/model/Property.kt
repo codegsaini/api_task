@@ -9,7 +9,7 @@ import kotlinx.serialization.Serializable
 data class Property(
     @PrimaryKey
     val id: Int,
-    val agent_id: Int?,
+    val agent_id: Int? = null,
     val address: String,
     val amenities: List<Amenity>,
     val area: String,

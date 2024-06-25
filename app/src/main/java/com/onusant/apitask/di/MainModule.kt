@@ -54,7 +54,7 @@ object MainModule {
 
     @Provides
     @Singleton
-    fun providesHomeService(httpClient: HttpClient) : PropertyService {
+    fun providesPropertyService(httpClient: HttpClient) : PropertyService {
         return PropertyService(httpClient)
     }
 
@@ -66,7 +66,7 @@ object MainModule {
 
     @Provides
     @Singleton
-    fun providesHomeRepository(propertyService: PropertyService, dao: PropertyDao) : PropertyRepository {
+    fun providesPropertyRepository(propertyService: PropertyService, dao: PropertyDao) : PropertyRepository {
         return PropertyRepository(propertyService, dao)
     }
 
