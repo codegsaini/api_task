@@ -34,4 +34,8 @@ class PropertyRepository(
         return dao.getAllProperties()
     }
 
+    fun getRecentProperties(recents: List<Int>) : List<Property> {
+        return dao.getRecentProperties(recents)
+    }
+
 }

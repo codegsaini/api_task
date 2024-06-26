@@ -1,7 +1,9 @@
 package com.onusant.apitask.presentation.property
 
+import android.content.Context
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,29 +34,43 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.AsyncImage
 import coil.compose.rememberAsyncImagePainter
+import coil.request.CachePolicy
+import coil.request.ImageRequest
 import com.onusant.apitask.model.Property
+import io.ktor.http.content.CachingProperty
+import kotlinx.coroutines.Dispatchers
 
 @Composable
 fun PropertyScreen(
     onBackClick: () -> Unit,
+    onPropertyRedirect: (id: Int) -> Unit,
     viewModel: PropertyViewModel = hiltViewModel()
 ) {
 
+    val context = LocalContext.current
     val properties = viewModel.state.value.properties
     val loading = viewModel.state.value.loading
 
     fun onRefresh() {
         viewModel.syncProperties()
+    }
+
+    fun onPropertyClick(id: Int) {
+        viewModel.addPropertyToRecents(id)
+        onPropertyRedirect(id)
     }
 
     Column(modifier = Modifier.fillMaxSize()) {
@@ -63,7 +79,9 @@ fun PropertyScreen(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(100.dp),
+                    .height(100.dp)
+                    .background(Color.Transparent)
+                    .weight(1f),
                 contentAlignment = Alignment.Center
             ) {
                 CircularProgressIndicator(
@@ -73,12 +91,12 @@ fun PropertyScreen(
             }
         }
         LazyColumn(
-            modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
-            contentPadding = PaddingValues(10.dp)
+            modifier = Modifier.fillMaxWidth().background(Color(0xFFF3F3F3)).weight(1f),
+            verticalArrangement = Arrangement.spacedBy(15.dp),
+            contentPadding = PaddingValues(15.dp)
         ) {
             items(items = properties) {
-                Property(it)
+                Property(context = context, property = it, onClick = { onPropertyRedirect(it.id) })
             }
         }
     }
@@ -133,21 +151,32 @@ private fun Toolbar(onBack: () -> Unit, onRefresh: () -> Unit) {
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun Property(property: Property) {
-    val image = rememberAsyncImagePainter("https://a.khelogame.xyz/${property.media_path}")
+fun Property(context: Context, property: Property, onClick: () -> Unit) {
+    val imageUrl = "https://a.khelogame.xyz/${property.media_path}"
+    val imageRequest = ImageRequest.Builder(context)
+        .data(imageUrl)
+        .crossfade(true)
+        .dispatcher(Dispatchers.IO)
+        .diskCacheKey(imageUrl)
+        .memoryCacheKey(imageUrl)
+        .diskCachePolicy(CachePolicy.ENABLED)
+        .memoryCachePolicy(CachePolicy.ENABLED)
+        .build()
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .shadow(2.dp, spotColor = Color(0xFF8A8A8A), shape = RoundedCornerShape(10.dp))
-            .background(Color.White, RoundedCornerShape(10.dp))
+            .shadow(2.dp, spotColor = Color(0xFF8A8A8A), shape = RoundedCornerShape(15.dp))
+            .background(Color.White, RoundedCornerShape(15.dp))
+            .clip(RoundedCornerShape(15.dp))
+            .clickable { onClick() }
     ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(Color(0xFFF3F3F3)),
         ) {
-            Image(
-                painter = image,
+            AsyncImage(
+                model = imageRequest,
                 contentDescription = null,
                 modifier = Modifier
                     .fillMaxWidth()

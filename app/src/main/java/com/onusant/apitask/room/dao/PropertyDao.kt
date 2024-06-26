@@ -13,6 +13,9 @@ interface PropertyDao {
     @Query("SELECT * FROM property")
     fun getAllProperties() : Flow<List<Property>>
 
+    @Query("SELECT * FROM property WHERE id IN (:recents)")
+    fun getRecentProperties(recents: List<Int>) : List<Property>
+
     @Query("SELECT * FROM property WHERE id = :id")
     suspend fun getProperty(id: String) : Property
 
