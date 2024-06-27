@@ -60,10 +60,7 @@ fun NavigationHost(navHostController: NavHostController) {
     NavHost(navController = navHostController, startDestination = startDestination) {
         navigation(route = "auth", startDestination = "login") {
             composable("login") {
-                LoginScreen(
-                    onBackClick = { navHostController.popBackStack() },
-                    onLoginSuccess = { navHostController.navigate("main") }
-                )
+                LoginScreen()
             }
         }
 
@@ -75,6 +72,9 @@ fun NavigationHost(navHostController: NavHostController) {
                         navHostController.navigate("auth") {
                             popUpTo("auth") { inclusive = true }
                         }
+                    },
+                    onPropertyRedirect = { id ->
+                        navHostController.navigate("property?id=$id")
                     }
                 )
             }

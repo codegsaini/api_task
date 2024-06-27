@@ -69,19 +69,18 @@ fun PropertyScreen(
     }
 
     fun onPropertyClick(id: Int) {
-        viewModel.addPropertyToRecents(id)
+        viewModel.addToRecentProperty(id)
         onPropertyRedirect(id)
     }
 
-    Column(modifier = Modifier.fillMaxSize()) {
+    Column(modifier = Modifier.fillMaxSize().background(Color(0xFFF3F3F3))) {
         Toolbar(onBack = { onBackClick() }, onRefresh = { onRefresh() })
         if (loading) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(100.dp)
                     .background(Color.Transparent)
-                    .weight(1f),
+                    .padding(10.dp),
                 contentAlignment = Alignment.Center
             ) {
                 CircularProgressIndicator(
@@ -91,12 +90,12 @@ fun PropertyScreen(
             }
         }
         LazyColumn(
-            modifier = Modifier.fillMaxWidth().background(Color(0xFFF3F3F3)).weight(1f),
+            modifier = Modifier.fillMaxWidth().weight(1f),
             verticalArrangement = Arrangement.spacedBy(15.dp),
             contentPadding = PaddingValues(15.dp)
         ) {
             items(items = properties) {
-                Property(context = context, property = it, onClick = { onPropertyRedirect(it.id) })
+                Property(context = context, property = it, onClick = { onPropertyClick(it.id) })
             }
         }
     }
@@ -109,6 +108,7 @@ private fun Toolbar(onBack: () -> Unit, onRefresh: () -> Unit) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
+                .background(Color.White)
                 .padding(vertical = 15.dp, horizontal = 15.dp),
         ) {
             IconButton(

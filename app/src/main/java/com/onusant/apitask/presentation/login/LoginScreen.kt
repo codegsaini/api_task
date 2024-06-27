@@ -1,16 +1,19 @@
 package com.onusant.apitask.presentation.login
 
 import android.util.Log
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -47,11 +50,8 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
-
 @Composable
 fun LoginScreen(
-    onBackClick: () -> Unit,
-    onLoginSuccess: () -> Unit,
     viewModel: LoginViewModel = hiltViewModel()
 ) {
 
@@ -66,27 +66,42 @@ fun LoginScreen(
     }
 
 
-    Column(modifier = Modifier.fillMaxSize()) {
-        Toolbar(onBack = { onBackClick() })
-        if (loading) {
-            Box(
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        AnimatedVisibility(
+            visible = response.isNotEmpty(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.TopCenter)
+            ) {
+            Text(
+                text = response,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(100.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator(
-                    color = Color.Black,
-                    strokeWidth = 2.dp
-                )
-            }
+                    .background(Color(0xFFFA3C3C))
+                    .padding(10.dp),
+                textAlign = TextAlign.Center,
+                color = Color.White
+            )
         }
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 30.dp, vertical = 30.dp),
+                .padding(horizontal = 30.dp),
             verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
+            Text(
+                text = "Login",
+                fontSize = 30.sp,
+                fontWeight = FontWeight.Bold,
+            )
+            Text(
+                text = "This is a POST API task",
+                fontSize = 15.sp,
+                color = Color.DarkGray
+            )
             TextField(
                 value = identifier.value,
                 onValueChange = { identifier.value = it },
@@ -123,56 +138,21 @@ fun LoginScreen(
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color.Black,
                     contentColor = Color.White),
-                modifier = Modifier.align(Alignment.CenterHorizontally)
-            ) {
-                Text(text = "Submit", fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
-            }
-        }
-        if (response.isNotEmpty()) {
-            Text(
-                text = response,
                 modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
                     .fillMaxWidth()
-                    .padding(20.dp),
-                textAlign = TextAlign.Center,
-                color = Color(0xFFFA3C3C)
-            )
-        }
-    }
-}
-
-
-@Composable
-private fun Toolbar(onBack: () -> Unit) {
-    Column {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 15.dp, horizontal = 15.dp),
-        ) {
-            IconButton(
-                onClick = { onBack() },
-                modifier = Modifier
-                    .align(Alignment.CenterStart)
-                    .size(24.dp)
+                    .height(50.dp),
+                enabled = !loading
             ) {
-                Image(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = null
-                )
+                if (loading) {
+                    CircularProgressIndicator(
+                        strokeWidth = 2.dp,
+                        modifier = Modifier.size(24.dp),
+                        color = Color.Black
+                    )
+                }
+                if (!loading) Text(text = "Submit", fontSize = 18.sp, fontWeight = FontWeight.SemiBold)
             }
-            Text(
-                text = "Login",
-                fontWeight = FontWeight.Bold,
-                fontSize = 20.sp,
-                modifier = Modifier.align(Alignment.Center)
-            )
         }
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(1.dp)
-                .background(Color(0xFFF0F0F0))
-        )
     }
 }

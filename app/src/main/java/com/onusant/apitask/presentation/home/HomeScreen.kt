@@ -2,15 +2,18 @@ package com.onusant.apitask.presentation.home
 
 import android.content.Context
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -35,6 +38,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.datastore.preferences.core.stringPreferencesKey
@@ -54,6 +58,7 @@ import kotlinx.serialization.json.Json
 fun HomeScreen(
     onRedirectToPropertiesScreen: () -> Unit,
     onLogoutSuccess: () -> Unit,
+    onPropertyRedirect: (id: Int) -> Unit,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
@@ -71,6 +76,10 @@ fun HomeScreen(
         }
     }
 
+    fun onPropertyClick(id: Int) {
+        viewModel.addToRecent(id)
+        onPropertyRedirect(id)
+    }
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -79,7 +88,9 @@ fun HomeScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(1f)
-                .background(Color.White)
+                .background(Color.White),
+            contentPadding = PaddingValues(15.dp),
+            verticalArrangement = Arrangement.spacedBy(20.dp)
         ) {
             item {
                 val image = ImageRequest.Builder(context)
@@ -95,7 +106,6 @@ fun HomeScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .aspectRatio(1.7777778f)
-                        .padding(15.dp)
                         .shadow(10.dp, spotColor = Color.Black, shape = RoundedCornerShape(20.dp))
                         .clip(RoundedCornerShape(20.dp))
                         .clickable { onRedirectToPropertiesScreen() }
@@ -131,14 +141,12 @@ fun HomeScreen(
                     text = "Recents",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.SemiBold,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 10.dp, horizontal = 20.dp)
+                    modifier = Modifier.fillMaxWidth()
                 )
             }
 
             items(recents) {
-                RecentItem(context = context, property = it)
+                RecentItem(context = context, property = it, onClick = { onPropertyClick(it.id) })
             }
 
         }
@@ -218,29 +226,48 @@ fun UserInfo(context: Context, userJson: String?, onLogoutRequest: () -> Unit) {
 }
 
 @Composable
-fun RecentItem(context: Context, property: Property) {
+fun RecentItem(context: Context, property: Property, onClick: () -> Unit) {
+    val imageUrl = "https://a.khelogame.xyz/${property.media_path}"
     val image = ImageRequest.Builder(context)
-        .data(property.media_path)
+        .data(imageUrl)
         .dispatcher(Dispatchers.IO)
         .diskCachePolicy(CachePolicy.ENABLED)
         .memoryCachePolicy(CachePolicy.ENABLED)
-        .diskCacheKey(property.media_path)
-        .memoryCacheKey(property.media_path)
+        .diskCacheKey(imageUrl)
+        .memoryCacheKey(imageUrl)
         .build()
-    Row {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(70.dp)
+            .shadow(3.dp, shape = RoundedCornerShape(10.dp))
+            .background(Color.White, RoundedCornerShape(10.dp))
+            .clickable { onClick() },
+    ) {
         AsyncImage(
             model = image,
             contentDescription = null,
             modifier = Modifier
-                .width(100.dp)
-                .fillMaxHeight()
+                .width(100.dp),
+            contentScale = ContentScale.Crop
         )
-        Column {
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .padding(vertical = 7.dp, horizontal = 15.dp)
+        ) {
             Text(
-                text = property.property_name
+                text = property.property_name,
+                fontSize = 15.sp,
+                fontWeight = FontWeight.Bold
             )
             Text(
-                text = property.address
+                text = property.address,
+                fontSize = 13.sp,
+                lineHeight = 15.sp,
+                color = Color.DarkGray,
+                overflow = TextOverflow.Ellipsis,
+                maxLines = 1
             )
         }
     }

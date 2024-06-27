@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.onusant.apitask.data.repository.PreferenceRepository
 import com.onusant.apitask.data.repository.PropertyRepository
 import com.onusant.apitask.datastore
+import com.onusant.apitask.model.RecentProperty
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.launchIn
@@ -19,13 +20,10 @@ import javax.inject.Inject
 @HiltViewModel
 class PropertyViewModel @Inject constructor(
     private val repository: PropertyRepository,
-    @ApplicationContext private val context: Context
 ) : ViewModel() {
 
     private val _state = mutableStateOf(PropertyScreenState())
     val state: State<PropertyScreenState> = _state
-
-    val preferences = PreferenceRepository(context.datastore)
 
     init {
         syncProperties()
@@ -50,12 +48,9 @@ class PropertyViewModel @Inject constructor(
         }
     }
 
-    fun addPropertyToRecents(id: Int) {
+    fun addToRecentProperty(id: Int) {
         viewModelScope.launch {
-            preferences.setPreference(
-                stringPreferencesKey("recents"),
-                id.toString()
-            )
+            repository.addRecent(RecentProperty(propertyId = id))
         }
     }
 

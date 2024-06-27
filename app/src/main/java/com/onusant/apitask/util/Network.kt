@@ -14,7 +14,7 @@ class Network {
 
     companion object {
 
-        suspend inline fun <reified T: Any> handleAPIResponse(
+        suspend inline fun <reified T: Any, E: Any> handleAPIResponse(
             crossinline execute: suspend () -> HttpResponse
         ) : Response<T> {
 

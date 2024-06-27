@@ -8,6 +8,10 @@ import com.onusant.apitask.model.User
 import com.onusant.apitask.util.Error
 import com.onusant.apitask.util.Network.Companion.handleAPIResponse
 import com.onusant.apitask.util.Response
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class LoginErrorResponse(val error: String)
 
 class LoginRepository(private val loginService: LoginService) {
 
@@ -19,7 +23,7 @@ class LoginRepository(private val loginService: LoginService) {
         onFinish: () -> Unit
     ) {
         onStart()
-        val response = handleAPIResponse<User> { loginService.login(payload) }
+        val response = handleAPIResponse<User, LoginErrorResponse> { loginService.login(payload) }
         when (response) {
             is Response.Success -> {
                 onSuccess(response.data)

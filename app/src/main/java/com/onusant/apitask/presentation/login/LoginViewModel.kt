@@ -8,6 +8,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.onusant.apitask.data.repository.LoginErrorResponse
 import com.onusant.apitask.data.repository.LoginRepository
 import com.onusant.apitask.data.repository.PreferenceRepository
 import com.onusant.apitask.data.service.LoginRequest
@@ -52,7 +53,7 @@ class LoginViewModel @Inject constructor(
                 },
                 onFailure = { response ->
                     _state.value = state.value.copy(
-                        response = response.message,
+                        response = Json.decodeFromString<LoginErrorResponse>(response.message).error,
                     )
                 },
                 onStart = {
